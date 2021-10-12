@@ -1,0 +1,24 @@
+{
+  "name": "ach-safe-vault",
+  "version": "1.0.0",
+  "description": "My application to safely save passwords.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ach",
+    "safe",
+    "vault",
+    "password",
+    "lotr",
+    "achraf",
+    "bounane"
+  ],
+  "author": "achBou",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^15.1.2"
+  }
+}
