@@ -1,3 +1,7 @@
+@font-face {
+    font-family: "Poppins";
+    src: url("resources/fonts/Poppins/Poppins-Regular.ttf");
+}
 html, body {
     height: 100%;
     width: 100%;
