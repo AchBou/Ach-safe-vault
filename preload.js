@@ -1,19 +1,8 @@
-const { ipcRenderer } = require('electron')
+const { ipcRenderer ,contextBridge } = require('electron')
 
-window.addEventListener('DOMContentLoaded', () => {
-    const passwordInput = document.getElementById('password');
-    passwordInput.addEventListener('keyup',  (e) => {
-        if(e.key ==='Enter') {
-            if(e.ctrlKey){
-                if(passwordInput.value=='hello') console.log('logged in')
-                else{
-                    console.log("password incorrect")
-                }
-            }
-            else {
-                ipcRenderer.invoke('showAlert')
-            }
-        }
-    })
+contextBridge.exposeInMainWorld('alertWindow', {
+    show: () => ipcRenderer.invoke('showAlert'),
+    close: () => ipcRenderer.invoke('closeAlert')
 })
+
 

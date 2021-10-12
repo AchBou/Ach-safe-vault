@@ -17,9 +17,9 @@ function createWindow () {
             height: 400,
             parent: mainWindow,
             modal: true,
-            // webPreferences: {
-            //     preload: path.join(__dirname, 'preload.js')
-            // }
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            }
         });
         alertWindow.loadFile('./windows/alert-window/unauth-message.html');
     })
@@ -29,8 +29,6 @@ function createWindow () {
     });
     mainWindow.loadFile('index.html')
 }
-
-
 
 
 
