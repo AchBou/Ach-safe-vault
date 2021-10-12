@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron')
+
 window.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     passwordInput.addEventListener('keyup',  (e) => {
@@ -9,8 +11,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
             else {
-                window.open('./windows/alert-window/unauth-message.html')
+                ipcRenderer.invoke('showAlert')
             }
         }
     })
 })
+

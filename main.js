@@ -1,8 +1,8 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain} = require('electron')
 const path = require("path");
 
 function createWindow () {
-    const win = new BrowserWindow({
+    const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences:{
@@ -10,8 +10,29 @@ function createWindow () {
         }
     })
 
-    win.loadFile('index.html')
+    let alertWindow;
+    ipcMain.handle('showAlert', async () => {
+        alertWindow = new BrowserWindow({
+            width: 500,
+            height: 400,
+            parent: mainWindow,
+            modal: true,
+            // webPreferences: {
+            //     preload: path.join(__dirname, 'preload.js')
+            // }
+        });
+        alertWindow.loadFile('./windows/alert-window/unauth-message.html');
+    })
+
+    ipcMain.handle('closeAlert',async ()=>{
+        alertWindow.close();
+    });
+    mainWindow.loadFile('index.html')
 }
+
+
+
+
 
 
 // loading the app when its ready
