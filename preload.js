@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
             else {
-                console.log('f off sc*mb*g!!')
+                window.open('./windows/alert-window/unauth-message.html')
             }
         }
     })
