@@ -8,3 +8,36 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+.container{
+    height: 100%;
+    overflow: auto;
+    background: indianred;
+}
+
+.title{
+    margin-top: 20px;
+    text-align: center;
+    font-size: 40px;
+    font-family: Poppins;
+    color: wheat;
+}
+
+.loginSection{
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.greeting{
+    font-size: 25px;
+    margin: 10px;
+}
+
+#password{
+    margin:15px;
+    padding: 10px;
+    font-size: 25px;
+    border-radius: 10px;
+}
