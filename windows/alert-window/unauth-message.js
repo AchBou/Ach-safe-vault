@@ -5,7 +5,6 @@ window.addEventListener('DOMContentLoaded', () => {
         await window.alertWindow.close()
     })
 
-    const container = document.getElementById('container')
-    console.log("container height:", container.offsetHeight)
+    window.alertWindow.setHeight(document.body.offsetHeight);
 })
 

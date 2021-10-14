@@ -13,8 +13,8 @@ function createWindow () {
     let alertWindow;
     ipcMain.handle('showAlert', async () => {
         alertWindow = new BrowserWindow({
-            width: 450,
-            height: 400,
+            width: 1000,
+            show: false,
             parent: mainWindow,
             modal: true,
             frame: false,
@@ -23,6 +23,7 @@ function createWindow () {
             }
         });
         alertWindow.loadFile('./windows/alert-window/unauth-message.html');
+        //alertWindow.openDevTools();
     })
 
     ipcMain.handle('closeAlert',async ()=>{
@@ -35,6 +36,11 @@ function createWindow () {
 
     ipcMain.handle('logOut',async ()=>{
         await mainWindow.loadFile('index.html')
+    });
+
+    ipcMain.handle('setHeight',async (event, height)=>{
+        alertWindow.setSize(1000,height);
+        alertWindow.show()
     });
 
     mainWindow.loadFile('index.html')

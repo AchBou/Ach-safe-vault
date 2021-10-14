@@ -12,7 +12,7 @@ html, body {
 .container{
     height: 100%;
     overflow: auto;
-    background: indianred;
+    background: #3c3f41;
 }
 
 .title{

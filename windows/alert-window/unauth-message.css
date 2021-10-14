@@ -7,14 +7,37 @@
     margin: 0;
     padding: 0;
 }
-.container img{
-    width: 450px;
-    height: 300px;
+
+.container{
+    height: 100%;
+    background: #38302a;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.image{
+    text-align: center;
+}
+
+.image img{
+    width: 650px;
 }
 
 .forbidden{
+    color: #b9a53d;
     text-align: center;
     font-family: Fanjofey;
     font-size: 60px;
-    padding: 20px;
+    padding: 40px;
+}
+
+#closeBtn{
+    margin: 30px auto 10px auto;
+    padding: 15px;
+    display: block;
+    font-size: 25px;
+    background: #f55757;
+    border-radius: 10px;
+    border: 0;
+    color: #ffeac3;
 }
