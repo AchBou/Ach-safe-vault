@@ -12,7 +12,7 @@ html, body {
 .container{
     height: 100%;
     overflow: auto;
-    background: #3c3f41;
+    background: indianred;
 }
 
 .title{
@@ -24,7 +24,7 @@ html, body {
 }
 
 .loginSection{
-    height: 50%;
+    height: 70%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,4 +40,12 @@ html, body {
     padding: 10px;
     font-size: 25px;
     border-radius: 10px;
+}
+
+#password-error{
+    visibility: hidden;
+    text-align: center;
+    margin-top: 50px;
+    font-size: 30px;
+    color: #f5eddf;
 }
