@@ -1,8 +1,9 @@
 window.addEventListener('DOMContentLoaded', () => {
-    const closeBtn = document.getElementById('closeBtn');
+    const closeBtn = document.getElementById('logout');
+
     closeBtn.addEventListener('click',async (e)=>{
         console.log("hello");
-        await window.alertWindow.close()
+        await window.mainWindow.bye_bye()
     })
 })
 

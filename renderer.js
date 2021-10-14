@@ -3,7 +3,7 @@ window.addEventListener('DOMContentLoaded', () => {
     passwordInput.addEventListener('keyup', async (e) => {
         if(e.key ==='Enter') {
             if(e.ctrlKey){
-                if(passwordInput.value=='hello') console.log('hello')
+                if(passwordInput.value=='hello') await window.mainWindow.welcome();
                 else{
                     console.log('password incorrect')
                 }
@@ -14,3 +14,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })
 })
+
+console.log("called")

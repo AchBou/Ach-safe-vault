@@ -27,6 +27,15 @@ function createWindow () {
     ipcMain.handle('closeAlert',async ()=>{
         alertWindow.close();
     });
+
+    ipcMain.handle('logIn',async ()=>{
+        await mainWindow.loadFile('screens/main-screen/main-screen.html')
+    });
+
+    ipcMain.handle('logOut',async ()=>{
+        await mainWindow.loadFile('index.html')
+    });
+
     mainWindow.loadFile('index.html')
 }
 
