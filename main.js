@@ -13,10 +13,11 @@ function createWindow () {
     let alertWindow;
     ipcMain.handle('showAlert', async () => {
         alertWindow = new BrowserWindow({
-            width: 500,
+            width: 450,
             height: 400,
             parent: mainWindow,
             modal: true,
+            frame: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             }
