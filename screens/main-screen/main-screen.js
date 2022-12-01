@@ -61,8 +61,7 @@ function filterTable(input){
     for (let i = 0; i <cells.length; i++) {
         txtValue = cells[i].textContent || cells.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            console.log('there:',cells[i].textContent)
-            containingRows.add(i);
+            containingRows.add(cells[i].className.split(' ')[1]);
         }
         hideAllRows(cells);
         showRows(containingRows);
@@ -70,12 +69,11 @@ function filterTable(input){
 }
 
 function showRows(containingRows) {
-    console.log(containingRows)
-    for (let i = 0; i <containingRows.size; i++) {
+   containingRows = [...containingRows];
+    for (let i = 0; i <containingRows.length; i++) {
         let result_cells = document.getElementsByClassName(`cell ${containingRows[i]}`);
         result_cells = [...result_cells];
         result_cells.forEach((c)=>{
-            console.log(c)
             c.style.display = '';
         })
     }
@@ -83,7 +81,6 @@ function showRows(containingRows) {
 
 function hideAllRows(cells){
     cells = [...cells]
-    console.log(cells)
     cells.forEach((c)=>{
         c.style.display = 'none'
     })
