@@ -1,35 +1,36 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("path");
 const fs = require("fs");
-const crypto = require("crypto");
+const VaultStore = require("./vault-store");
 
 let mainWindow = null;
 let alertWindow = null;
 let authenticated = false;
 
-// ---------- authentication (master password lives in the main process only) ----------
+// ---------- vault state (key + data only exist in memory while unlocked) ----------
 
-const authFile = () => path.join(app.getPath('userData'), 'auth.json');
+const vaultFile = () => path.join(app.getPath('userData'), 'vault.enc');
+const legacyFile = () => path.join(__dirname, 'vault/passwords.json');
+const MIN_PASSWORD_LENGTH = 8;
 
-function hashPassword(password, salt = crypto.randomBytes(16)) {
-    const hash = crypto.scryptSync(password, salt, 64);
-    return { salt: salt.toString('hex'), hash: hash.toString('hex') };
+let vaultKey = null;
+let vaultData = null;
+let failedAttempts = 0;
+let lockedUntil = 0;
+
+function lock() {
+    authenticated = false;
+    if (vaultKey) vaultKey.fill(0);
+    vaultKey = null;
+    vaultData = null;
 }
 
-// First run: seed the master password with the old default ("hello").
-// TODO: replace with a proper "set master password" screen, then change it.
-function ensureAuthFile() {
-    if (!fs.existsSync(authFile())) {
-        fs.mkdirSync(path.dirname(authFile()), { recursive: true });
-        fs.writeFileSync(authFile(), JSON.stringify(hashPassword('hello')));
+// Slow down brute force: after 3 failures, wait 2^(n-3) seconds (max 60s).
+function registerFailure() {
+    failedAttempts++;
+    if (failedAttempts >= 3) {
+        lockedUntil = Date.now() + Math.min(2 ** (failedAttempts - 3), 60) * 1000;
     }
-}
-
-function verifyPassword(password) {
-    if (typeof password !== 'string') return false;
-    const { salt, hash } = JSON.parse(fs.readFileSync(authFile(), 'utf8'));
-    const candidate = crypto.scryptSync(password, Buffer.from(salt, 'hex'), 64);
-    return crypto.timingSafeEqual(candidate, Buffer.from(hash, 'hex'));
 }
 
 // ---------- IPC (registered once, not per window) ----------
@@ -61,27 +62,53 @@ function registerIpc() {
         alertWindow.show();
     });
 
-    ipcMain.handle('logIn', async (event, password) => {
-        if (!verifyPassword(password)) return false;
+    ipcMain.handle('vaultStatus', async () => ({ exists: VaultStore.exists(vaultFile()) }));
+
+    ipcMain.handle('setupVault', async (event, password) => {
+        if (VaultStore.exists(vaultFile())) return { ok: false, error: 'Vault already exists' };
+        if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+            return { ok: false, error: `Use at least ${MIN_PASSWORD_LENGTH} characters` };
+        }
+        // import the old plaintext vault the first time, if present
+        let initial = {};
+        try { initial = JSON.parse(fs.readFileSync(legacyFile(), 'utf8')); } catch {}
+        vaultKey = VaultStore.create(vaultFile(), password, initial);
+        vaultData = initial;
         authenticated = true;
         await mainWindow.loadFile(path.join(__dirname, 'screens/main-screen/main-screen.html'));
-        return true;
+        return { ok: true };
+    });
+
+    ipcMain.handle('logIn', async (event, password) => {
+        const wait = lockedUntil - Date.now();
+        if (wait > 0) return { ok: false, wait: Math.ceil(wait / 1000) };
+        if (typeof password !== 'string') return { ok: false };
+        const result = VaultStore.unlock(vaultFile(), password);
+        if (!result) {
+            registerFailure();
+            return { ok: false };
+        }
+        failedAttempts = 0;
+        vaultKey = result.key;
+        vaultData = result.data;
+        authenticated = true;
+        await mainWindow.loadFile(path.join(__dirname, 'screens/main-screen/main-screen.html'));
+        return { ok: true };
     });
 
     ipcMain.handle('logOut', async () => {
-        authenticated = false;
+        lock();
         await mainWindow.loadFile(path.join(__dirname, 'index.html'));
     });
 
     ipcMain.handle('readData', async () => {
         if (!authenticated) throw new Error('Not authenticated');
-        const buffer = fs.readFileSync(path.join(__dirname, 'vault/passwords.json'));
-        return JSON.parse(buffer.toString());
+        return vaultData;
     });
 }
 
 function createWindow() {
-    authenticated = false;
+    lock();
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -94,7 +121,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-    ensureAuthFile();
     registerIpc();
     createWindow()
 
@@ -105,6 +131,8 @@ app.whenReady().then(() => {
 })
 
 // quit when all windows are closed, except on macOS
+app.on('before-quit', lock)
+
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit()
 })

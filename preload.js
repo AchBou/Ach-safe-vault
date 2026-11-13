@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('alertWindow', {
     setHeight: (height)=> ipcRenderer.invoke('setHeight', height)
 })
 contextBridge.exposeInMainWorld('mainWindow', {
+    status: () => ipcRenderer.invoke('vaultStatus'),
+    setup: (password) => ipcRenderer.invoke('setupVault', password),
     welcome: (password) => ipcRenderer.invoke('logIn', password),
     bye_bye: () => ipcRenderer.invoke('logOut')
 })

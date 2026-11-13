@@ -18,3 +18,5 @@ npm-debug.log*
 /coverage
 /dist
 /node_modules
+# plaintext legacy vault (data now lives encrypted in userData/vault.enc)
+/vault/

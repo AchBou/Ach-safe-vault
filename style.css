@@ -35,7 +35,7 @@ html, body {
     margin: 10px;
 }
 
-#password{
+#password, #password-confirm{
     margin:15px;
     padding: 10px;
     font-size: 25px;
