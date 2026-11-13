@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
+const { pathToFileURL } = require('url')
 const path = require("path");
 const fs = require("fs");
 const VaultStore = require("./vault-store");
@@ -35,8 +36,34 @@ function registerFailure() {
 
 // ---------- IPC (registered once, not per window) ----------
 
+const APP_URL = pathToFileURL(__dirname).href;
+
+// Only pages shipped inside the app may call IPC handlers.
+function handle(channel, fn) {
+    ipcMain.handle(channel, (event, ...args) => {
+        const url = event.senderFrame && event.senderFrame.url;
+        if (!url || !url.startsWith(APP_URL)) throw new Error('Blocked IPC from untrusted frame');
+        return fn(event, ...args);
+    });
+}
+
+const secureWebPreferences = () => ({
+    preload: path.join(__dirname, 'preload.js'),
+    contextIsolation: true,
+    sandbox: true,
+    nodeIntegration: false,
+});
+
+// No popups, and no navigation away from the app's own files.
+function lockDown(win) {
+    win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+    win.webContents.on('will-navigate', (e, url) => {
+        if (!url.startsWith(APP_URL)) e.preventDefault();
+    });
+}
+
 function registerIpc() {
-    ipcMain.handle('showAlert', async () => {
+    handle('showAlert', async () => {
         if (alertWindow && !alertWindow.isDestroyed()) return;
         alertWindow = new BrowserWindow({
             width: 1000,
@@ -44,27 +71,26 @@ function registerIpc() {
             parent: mainWindow,
             modal: true,
             frame: false,
-            webPreferences: {
-                preload: path.join(__dirname, 'preload.js')
-            }
+            webPreferences: secureWebPreferences()
         });
+        lockDown(alertWindow);
         alertWindow.on('closed', () => { alertWindow = null; });
         alertWindow.loadFile(path.join(__dirname, 'windows/alert-window/unauth-message.html'));
     })
 
-    ipcMain.handle('closeAlert', async () => {
+    handle('closeAlert', async () => {
         if (alertWindow && !alertWindow.isDestroyed()) alertWindow.close();
     });
 
-    ipcMain.handle('setHeight', async (event, height) => {
+    handle('setHeight', async (event, height) => {
         if (!alertWindow || alertWindow.isDestroyed()) return;
         alertWindow.setSize(1000, Number(height) || 300);
         alertWindow.show();
     });
 
-    ipcMain.handle('vaultStatus', async () => ({ exists: VaultStore.exists(vaultFile()) }));
+    handle('vaultStatus', async () => ({ exists: VaultStore.exists(vaultFile()) }));
 
-    ipcMain.handle('setupVault', async (event, password) => {
+    handle('setupVault', async (event, password) => {
         if (VaultStore.exists(vaultFile())) return { ok: false, error: 'Vault already exists' };
         if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
             return { ok: false, error: `Use at least ${MIN_PASSWORD_LENGTH} characters` };
@@ -79,7 +105,7 @@ function registerIpc() {
         return { ok: true };
     });
 
-    ipcMain.handle('logIn', async (event, password) => {
+    handle('logIn', async (event, password) => {
         const wait = lockedUntil - Date.now();
         if (wait > 0) return { ok: false, wait: Math.ceil(wait / 1000) };
         if (typeof password !== 'string') return { ok: false };
@@ -96,12 +122,12 @@ function registerIpc() {
         return { ok: true };
     });
 
-    ipcMain.handle('logOut', async () => {
+    handle('logOut', async () => {
         lock();
         await mainWindow.loadFile(path.join(__dirname, 'index.html'));
     });
 
-    ipcMain.handle('readData', async () => {
+    handle('readData', async () => {
         if (!authenticated) throw new Error('Not authenticated');
         return vaultData;
     });
@@ -112,12 +138,11 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
-        }
+        webPreferences: secureWebPreferences()
     })
+    lockDown(mainWindow);
     mainWindow.on('closed', () => { mainWindow = null; });
-    mainWindow.loadFile('index.html')
+    mainWindow.loadFile(path.join(__dirname, 'index.html'))
 }
 
 app.whenReady().then(() => {
