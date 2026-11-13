@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "node --test \"test/*.test.js\""
+    "test": "node --test \"test/*.test.js\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis"
   },
   "keywords": [
     "ach",
@@ -19,9 +21,44 @@
   "author": "achBou",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^45.3.2"
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
   },
   "dependencies": {
     "bootstrap-icons": "^1.10.2"
+  },
+  "build": {
+    "appId": "com.ach.safevault",
+    "productName": "Ach Safe Vault",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "entries.js",
+      "vault-store.js",
+      "strength.js",
+      "index.html",
+      "style.css",
+      "theme.css",
+      "screens/**/*",
+      "windows/**/*",
+      "resources/**/*",
+      "node_modules/bootstrap-icons/font/**/*",
+      "package.json",
+      "!node_modules/bootstrap-icons/icons/**",
+      "!node_modules/bootstrap-icons/bootstrap-icons.svg",
+      "!node_modules/bootstrap-icons/font/*.scss",
+      "!node_modules/bootstrap-icons/font/*.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
