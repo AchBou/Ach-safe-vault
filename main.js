@@ -3,6 +3,7 @@ const { pathToFileURL } = require('url')
 const path = require("path");
 const fs = require("fs");
 const VaultStore = require("./vault-store");
+const Entries = require("./entries");
 
 let mainWindow = null;
 let alertWindow = null;
@@ -64,28 +65,14 @@ function registerFailure() {
     }
 }
 
-// ---------- entry operations (validate, persist, then swap in-memory data) ----------
+// ---------- persisting entry changes ----------
 
-const MAX_FIELD = 500;
-const RESERVED = new Set(['__proto__', 'constructor', 'prototype']);
-
-function cleanEntry(platform, id, pwd) {
-    if (typeof platform !== 'string' || typeof id !== 'string' || typeof pwd !== 'string') return null;
-    platform = platform.trim();
-    if (!platform || RESERVED.has(platform)) return null;
-    if ([platform, id, pwd].some((v) => v.length > MAX_FIELD)) return null;
-    return { platform, entry: { id, pwd } };
-}
-
-// `change` receives a shallow copy and mutates it; returns an error string or null.
-function mutateVault(change) {
+// `result` is an Entries function result: { data } or { error }.
+function commit(result) {
     if (!authenticated) throw new Error('Not authenticated');
-    const next = Object.assign(Object.create(null), vaultData);
-    const error = change(next);
-    if (error) return { ok: false, error };
-    const plain = Object.assign({}, next);
-    VaultStore.save(vaultFile(), vaultKey, plain); // throws -> in-memory data untouched
-    vaultData = plain;
+    if (result.error) return { ok: false, error: result.error };
+    VaultStore.save(vaultFile(), vaultKey, result.data); // throws -> in-memory data untouched
+    vaultData = result.data;
     return { ok: true, data: vaultData };
 }
 
@@ -184,43 +171,20 @@ function registerIpc() {
         await mainWindow.loadFile(path.join(__dirname, 'index.html'));
     });
 
-    handle('addEntry', async (event, platform, id, pwd) => {
-        const c = cleanEntry(platform, id, pwd);
-        if (!c) return { ok: false, error: 'Invalid entry' };
-        return mutateVault((d) => {
-            if (c.platform in d) return 'That platform already exists';
-            d[c.platform] = c.entry;
-        });
-    });
+    handle('addEntry', async (event, platform, id, pwd) =>
+        commit(Entries.add(vaultData, platform, id, pwd)));
 
-    handle('updateEntry', async (event, oldPlatform, platform, id, pwd) => {
-        const c = cleanEntry(platform, id, pwd);
-        if (!c || typeof oldPlatform !== 'string') return { ok: false, error: 'Invalid entry' };
-        return mutateVault((d) => {
-            if (!(oldPlatform in d)) return 'Entry not found';
-            if (c.platform !== oldPlatform && c.platform in d) return 'That platform already exists';
-            // rebuild so the edited entry keeps its position
-            for (const k of Object.keys(d)) {
-                const v = d[k];
-                delete d[k];
-                d[k === oldPlatform ? c.platform : k] = k === oldPlatform ? c.entry : v;
-            }
-        });
-    });
+    handle('updateEntry', async (event, oldPlatform, platform, id, pwd) =>
+        commit(Entries.update(vaultData, oldPlatform, platform, id, pwd)));
 
-    handle('deleteEntry', async (event, platform) => {
-        if (typeof platform !== 'string') return { ok: false, error: 'Invalid entry' };
-        return mutateVault((d) => {
-            if (!(platform in d)) return 'Entry not found';
-            delete d[platform];
-        });
-    });
+    handle('deleteEntry', async (event, platform) =>
+        commit(Entries.remove(vaultData, platform)));
 
     handle('activity', async () => { resetIdleTimer(); });
 
     handle('copyPassword', async (event, platform) => {
         if (!authenticated) throw new Error('Not authenticated');
-        if (typeof platform !== 'string' || !(platform in vaultData)) return { ok: false };
+        if (typeof platform !== 'string' || !Object.prototype.hasOwnProperty.call(vaultData, platform)) return { ok: false };
         clearClipboardNow();
         copiedValue = vaultData[platform].pwd;
         clipboard.writeText(copiedValue);
