@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld('mainWindow', {
 
 contextBridge.exposeInMainWorld('homeWindow', {
     read: () => ipcRenderer.invoke('readData'),
+    copy: (platform) => ipcRenderer.invoke('copyPassword', platform),
+    activity: () => ipcRenderer.invoke('activity'),
     add: (platform, id, pwd) => ipcRenderer.invoke('addEntry', platform, id, pwd),
     update: (oldPlatform, platform, id, pwd) => ipcRenderer.invoke('updateEntry', oldPlatform, platform, id, pwd),
     remove: (platform) => ipcRenderer.invoke('deleteEntry', platform)

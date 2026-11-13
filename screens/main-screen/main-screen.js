@@ -10,10 +10,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     handleActions(table);
     handleDialog(table, input);
     handleLogout();
+    trackActivity();
 })
 
 // unique token so a stored value of "actions" can't be mistaken for the icon cell
 const ACTIONS = Symbol('actions');
+const MASK = '•'.repeat(8);
 
 // header = first 4 children; everything after is data rows
 function renderTable(table, data){
@@ -22,7 +24,11 @@ function renderTable(table, data){
     for(const [platform , {id,pwd}] of Object.entries(data)){
         table.appendChild(createSpanElement(platform,i));
         table.appendChild(createSpanElement(id,i));
-        table.appendChild(createSpanElement(pwd,i));
+        // password stays out of the DOM until revealed
+        const pwdSpan = createSpanElement(MASK,i);
+        pwdSpan.classList.add('pwd-cell');
+        pwdSpan.dataset.platform = platform;
+        table.appendChild(pwdSpan);
         const actionSpan = createSpanElement(ACTIONS,i);
         actionSpan.dataset.platform = platform;
         table.appendChild(actionSpan);
@@ -36,7 +42,7 @@ function refresh(table, input, data){
     filterTable(input);
 }
 
-const ACTION_ICONS = [['bi-eye', 'view'], ['bi-pen', 'edit'], ['bi-trash', 'delete']];
+const ACTION_ICONS = [['bi-eye', 'view'], ['bi-clipboard', 'copy'], ['bi-pen', 'edit'], ['bi-trash', 'delete']];
 
 function createSpanElement(content,i){
     let span = document.createElement('span');
@@ -116,9 +122,38 @@ function handleActions(table){
         const icon = e.target.closest('i[data-action]');
         if (!icon) return;
         const platform = icon.parentElement.dataset.platform;
-        if (icon.dataset.action === 'edit') openDialog(platform);
+        if (icon.dataset.action === 'view') toggleReveal(table, icon, platform);
+        else if (icon.dataset.action === 'copy') await copyPassword(icon, platform);
+        else if (icon.dataset.action === 'edit') openDialog(platform);
         else if (icon.dataset.action === 'delete') await deleteEntry(table, platform);
     });
+}
+
+function toggleReveal(table, icon, platform){
+    const cell = [...table.querySelectorAll('.pwd-cell')].find((c) => c.dataset.platform === platform);
+    const showing = icon.classList.contains('bi-eye-slash');
+    cell.textContent = showing ? MASK : vault[platform].pwd;
+    icon.classList.toggle('bi-eye-slash', !showing);
+    icon.classList.toggle('bi-eye', showing);
+}
+
+async function copyPassword(icon, platform){
+    const res = await window.homeWindow.copy(platform);
+    if (!res.ok) return;
+    icon.classList.replace('bi-clipboard', 'bi-clipboard-check');
+    setTimeout(() => icon.classList.replace('bi-clipboard-check', 'bi-clipboard'), 1500);
+}
+
+// tell the main process the user is active so the idle auto-lock doesn't fire
+function trackActivity(){
+    let last = 0;
+    const ping = () => {
+        const now = Date.now();
+        if (now - last < 5000) return;
+        last = now;
+        window.homeWindow.activity();
+    };
+    ['mousemove', 'mousedown', 'keydown', 'wheel'].forEach((ev) => window.addEventListener(ev, ping, { passive: true }));
 }
 
 async function deleteEntry(table, platform){

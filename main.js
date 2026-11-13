@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, clipboard } = require('electron')
 const { pathToFileURL } = require('url')
 const path = require("path");
 const fs = require("fs");
@@ -19,7 +19,37 @@ let vaultData = null;
 let failedAttempts = 0;
 let lockedUntil = 0;
 
+const IDLE_LOCK_MS = Number(process.env.ACH_IDLE_MS) || 2 * 60 * 1000;
+const CLIPBOARD_CLEAR_MS = Number(process.env.ACH_CLIP_MS) || 20 * 1000;
+let idleTimer = null;
+let clipboardTimer = null;
+let copiedValue = null;
+
+// In recent Electron versions clipboard reads are async.
+async function clearClipboardNow() {
+    clearTimeout(clipboardTimer);
+    clipboardTimer = null;
+    const value = copiedValue;
+    copiedValue = null;
+    // only wipe it if it still holds what we put there
+    if (value !== null && (await clipboard.readText()) === value) await clipboard.clear();
+}
+
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    if (!authenticated) return;
+    idleTimer = setTimeout(async () => {
+        lock();
+        if (alertWindow && !alertWindow.isDestroyed()) alertWindow.close();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            await mainWindow.loadFile(path.join(__dirname, 'index.html'));
+        }
+    }, IDLE_LOCK_MS);
+}
+
 function lock() {
+    clearTimeout(idleTimer);
+    clearClipboardNow();
     authenticated = false;
     if (vaultKey) vaultKey.fill(0);
     vaultKey = null;
@@ -126,6 +156,7 @@ function registerIpc() {
         vaultKey = VaultStore.create(vaultFile(), password, initial);
         vaultData = initial;
         authenticated = true;
+        resetIdleTimer();
         await mainWindow.loadFile(path.join(__dirname, 'screens/main-screen/main-screen.html'));
         return { ok: true };
     });
@@ -143,6 +174,7 @@ function registerIpc() {
         vaultKey = result.key;
         vaultData = result.data;
         authenticated = true;
+        resetIdleTimer();
         await mainWindow.loadFile(path.join(__dirname, 'screens/main-screen/main-screen.html'));
         return { ok: true };
     });
@@ -182,6 +214,18 @@ function registerIpc() {
             if (!(platform in d)) return 'Entry not found';
             delete d[platform];
         });
+    });
+
+    handle('activity', async () => { resetIdleTimer(); });
+
+    handle('copyPassword', async (event, platform) => {
+        if (!authenticated) throw new Error('Not authenticated');
+        if (typeof platform !== 'string' || !(platform in vaultData)) return { ok: false };
+        clearClipboardNow();
+        copiedValue = vaultData[platform].pwd;
+        clipboard.writeText(copiedValue);
+        clipboardTimer = setTimeout(clearClipboardNow, CLIPBOARD_CLEAR_MS);
+        return { ok: true, seconds: CLIPBOARD_CLEAR_MS / 1000 };
     });
 
     handle('readData', async () => {
