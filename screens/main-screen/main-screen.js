@@ -11,6 +11,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 })
 
 
+// unique token so a stored value of "actions" can't be mistaken for the icon cell
+const ACTIONS = Symbol('actions');
+
 function tableInit(table, data){
     let i = 0;
     for(const [platform , {id,pwd}] of Object.entries(data)){
@@ -20,22 +23,27 @@ function tableInit(table, data){
         table.appendChild(idSpan);
         let pwdSpan = createSpanElement(pwd,i);
         table.appendChild(pwdSpan);
-        let actionSpan = createSpanElement("actions",i);
+        let actionSpan = createSpanElement(ACTIONS,i);
         table.appendChild(actionSpan);
         i++;
     }
 }
 
-function returnActionsContent() {
-    return  '<i class="bi bi-eye"></i>' +
-            '<i class="bi bi-pen"></i>' +
-            '<i class="bi bi-trash"></i>';
-}
+const ACTION_ICONS = ['bi-eye', 'bi-pen', 'bi-trash'];
 
 function createSpanElement(content,i){
     let span = document.createElement('span');
-    span.innerHTML = content==='actions'?returnActionsContent():content;
     span.className = `cell ${i}`;
+    if (content === ACTIONS) {
+        ACTION_ICONS.forEach((icon) => {
+            const el = document.createElement('i');
+            el.className = `bi ${icon}`;
+            span.appendChild(el);
+        });
+    } else {
+        // textContent: vault values are data, never markup
+        span.textContent = String(content);
+    }
     return span;
 }
 
@@ -61,18 +69,17 @@ function handleLogout(){
 }
 
 function filterTable(input){
-    let containingRows = new Set();
-    let cells, filter, txtValue;
-    filter = input.value.toUpperCase();
-    cells = document.getElementsByClassName("cell");
-    for (let i = 0; i <cells.length; i++) {
-        txtValue = cells[i].textContent || cells.innerText;
+    const containingRows = new Set();
+    const filter = input.value.toUpperCase();
+    const cells = document.getElementsByClassName("cell");
+    for (let i = 0; i < cells.length; i++) {
+        const txtValue = cells[i].textContent || '';
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             containingRows.add(cells[i].className.split(' ')[1]);
         }
-        hideAllRows(cells);
-        showRows(containingRows);
     }
+    hideAllRows(cells);
+    showRows(containingRows);
 }
 
 function showRows(containingRows) {
