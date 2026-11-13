@@ -1,5 +1,6 @@
-window.addEventListener('DOMContentLoaded', () => {
-    const data= window.homeWindow.read();
+window.addEventListener('DOMContentLoaded', async () => {
+    const data = await window.homeWindow.read();
+    console.log(data)
     const table = document.getElementById('table');
     const input = document.getElementById('searchInput');
 
@@ -25,9 +26,15 @@ function tableInit(table, data){
     }
 }
 
+function returnActionsContent() {
+    return  '<i class="bi bi-eye"></i>' +
+            '<i class="bi bi-pen"></i>' +
+            '<i class="bi bi-trash"></i>';
+}
+
 function createSpanElement(content,i){
     let span = document.createElement('span');
-    span.textContent = content;
+    span.innerHTML = content==='actions'?returnActionsContent():content;
     span.className = `cell ${i}`;
     return span;
 }

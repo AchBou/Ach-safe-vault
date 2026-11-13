@@ -1,5 +1,4 @@
 const { ipcRenderer ,contextBridge } = require('electron')
-const fs = require("fs");
 
 contextBridge.exposeInMainWorld('alertWindow', {
     show: () => ipcRenderer.invoke('showAlert'),
@@ -12,13 +11,9 @@ contextBridge.exposeInMainWorld('mainWindow', {
 })
 
 contextBridge.exposeInMainWorld('homeWindow', {
-    read: () => {
-        const buffer = fs.readFileSync('vault/passwords.json')
-        let data = JSON.parse(buffer.toString());
-        console.log('reading done');
-        return data;
-    },
+    read: () => ipcRenderer.invoke('readData')
 })
+
 
 
 

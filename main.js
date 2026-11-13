@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain} = require('electron')
 const path = require("path");
+const fs = require("fs");
 
 function createWindow () {
     const mainWindow = new BrowserWindow({
@@ -42,6 +43,14 @@ function createWindow () {
         alertWindow.setSize(1000,height);
         alertWindow.show()
     });
+
+    ipcMain.handle('readData',async (event)=>{
+        const buffer = fs.readFileSync('vault/passwords.json')
+        let data = JSON.parse(buffer.toString());
+        console.log('reading done');
+        return data;
+    });
+
 
     mainWindow.loadFile('index.html')
 }
