@@ -6,8 +6,8 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log(window.mainWindow)
         if(e.key ==='Enter') {
             if(e.ctrlKey){
-                if(passwordInput.value==='hello') await window.mainWindow.welcome();
-                else{
+                const ok = await window.mainWindow.welcome(passwordInput.value);
+                if(!ok){
                     const errorMessage = document.getElementById('password-error')
                     errorMessage.style.visibility = 'visible';
                 }

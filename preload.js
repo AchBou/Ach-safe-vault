@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld('alertWindow', {
     setHeight: (height)=> ipcRenderer.invoke('setHeight', height)
 })
 contextBridge.exposeInMainWorld('mainWindow', {
-    welcome: () => ipcRenderer.invoke('logIn'),
+    welcome: (password) => ipcRenderer.invoke('logIn', password),
     bye_bye: () => ipcRenderer.invoke('logOut')
 })
 
