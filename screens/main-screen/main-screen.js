@@ -10,6 +10,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     handleActions(table);
     handleDialog(table, input);
     handleLogout();
+    handleBackup();
     trackActivity();
 })
 
@@ -193,5 +194,19 @@ function handleDialog(table, input){
         if (!res.ok) { error.textContent = res.error; return; }
         dialog.close();
         refresh(table, input, res.data);
+    });
+}
+
+
+// ---------- export / import of the encrypted vault file ----------
+
+function handleBackup(){
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+        await window.homeWindow.exportVault();
+    });
+    document.getElementById('importBtn').addEventListener('click', async () => {
+        const res = await window.homeWindow.importVault();
+        if (!res.ok && res.error) alert(res.error);
+        // on success the main process locks and returns to the login page
     });
 }

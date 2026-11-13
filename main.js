@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, clipboard } = require('electron')
+const { app, BrowserWindow, ipcMain, clipboard, dialog } = require('electron')
 const { pathToFileURL } = require('url')
 const path = require("path");
 const fs = require("fs");
@@ -179,6 +179,73 @@ function registerIpc() {
 
     handle('deleteEntry', async (event, platform) =>
         commit(Entries.remove(vaultData, platform)));
+
+    // ----- export / import of the encrypted vault file -----
+
+    handle('exportVault', async () => {
+        if (!authenticated) throw new Error('Not authenticated');
+        resetIdleTimer();
+        const stamp = new Date().toISOString().slice(0, 10);
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: 'Export encrypted vault',
+            defaultPath: `ach-vault-${stamp}.enc`,
+            filters: [{ name: 'Encrypted vault', extensions: ['enc'] }],
+        });
+        resetIdleTimer();
+        if (canceled || !filePath) return { ok: false, canceled: true };
+        fs.copyFileSync(vaultFile(), filePath);
+        await dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: 'Vault exported',
+            detail: `${filePath}
+
+The file is encrypted. Opening it on another device needs your master password.`,
+        });
+        resetIdleTimer();
+        return { ok: true, path: filePath };
+    });
+
+    handle('importVault', async () => {
+        const hasVault = VaultStore.exists(vaultFile());
+        // replacing an existing vault requires being logged in
+        if (hasVault && !authenticated) return { ok: false, error: 'Log in before importing' };
+        resetIdleTimer();
+        const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+            title: 'Import encrypted vault',
+            properties: ['openFile'],
+            filters: [{ name: 'Encrypted vault', extensions: ['enc'] }],
+        });
+        resetIdleTimer();
+        if (canceled || !filePaths.length) return { ok: false, canceled: true };
+
+        const incoming = fs.readFileSync(filePaths[0]);
+        if (!VaultStore.isValidFile(incoming)) return { ok: false, error: 'That is not a valid vault file' };
+
+        if (hasVault) {
+            const { response } = await dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                buttons: ['Cancel', 'Replace vault'],
+                defaultId: 0,
+                cancelId: 0,
+                title: 'Replace current vault?',
+                message: 'Replace the current vault with the imported one?',
+                detail: 'A backup of the current vault is kept next to it. You will need the master password of the imported vault to log in.',
+            });
+            resetIdleTimer();
+            if (response !== 1) return { ok: false, canceled: true };
+            const stamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+            fs.copyFileSync(vaultFile(), `${vaultFile()}.bak-${stamp}`);
+        }
+
+        fs.mkdirSync(path.dirname(vaultFile()), { recursive: true });
+        fs.writeFileSync(vaultFile() + '.tmp', incoming);
+        fs.renameSync(vaultFile() + '.tmp', vaultFile());
+        lock();
+        failedAttempts = 0;
+        lockedUntil = 0;
+        await mainWindow.loadFile(path.join(__dirname, 'index.html'));
+        return { ok: true };
+    });
 
     handle('activity', async () => { resetIdleTimer(); });
 

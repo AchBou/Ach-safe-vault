@@ -66,4 +66,17 @@ function save(file, key, data) {
     writeAtomic(file, JSON.stringify(encrypt(key, Buffer.from(f.salt, 'hex'), data)));
 }
 
-module.exports = { exists, create, unlock, save };
+// Structural check only (can't verify the password): is this a vault file we wrote?
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+function isValidFile(buffer) {
+    try {
+        if (!Buffer.isBuffer(buffer) || buffer.length > MAX_FILE_BYTES) return false;
+        const f = JSON.parse(buffer.toString('utf8'));
+        const hex = (v, len) => typeof v === 'string' && /^[0-9a-f]*$/i.test(v) && (len === undefined || v.length === len);
+        return f.v === 1 && hex(f.salt, 32) && hex(f.iv, 24) && hex(f.tag, 32) && hex(f.ct) && f.ct.length > 0;
+    } catch {
+        return false;
+    }
+}
+
+module.exports = { exists, create, unlock, save, isValidFile };

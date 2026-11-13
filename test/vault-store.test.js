@@ -52,3 +52,16 @@ test('unlock on a missing or corrupt file returns null', () => {
     fs.writeFileSync(f, 'not json');
     assert.strictEqual(V.unlock(f, 'x'), null);
 });
+
+test('isValidFile accepts our own files and rejects junk', () => {
+    const f = tmp();
+    V.create(f, 'right-password', { a: 1 });
+    assert.strictEqual(V.isValidFile(fs.readFileSync(f)), true);
+    assert.strictEqual(V.isValidFile(Buffer.from('not json')), false);
+    assert.strictEqual(V.isValidFile(Buffer.from('{}')), false);
+    assert.strictEqual(V.isValidFile(Buffer.from(JSON.stringify({ v: 2, salt: '', iv: '', tag: '', ct: '' }))), false);
+    const j = JSON.parse(fs.readFileSync(f, 'utf8'));
+    j.salt = 'zz'.repeat(16);
+    assert.strictEqual(V.isValidFile(Buffer.from(JSON.stringify(j))), false);
+    assert.strictEqual(V.isValidFile('string'), false);
+});

@@ -10,6 +10,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         greeting.textContent = 'First time here! Choose a master password';
         passwordInput.placeholder = 'New master password';
         confirmInput.hidden = false;
+        const importBtn = document.getElementById('importBtn');
+        importBtn.hidden = false;
+        importBtn.addEventListener('click', async () => {
+            const res = await window.mainWindow.importVault();
+            if (!res.ok && res.error) showError(res.error);
+        });
         document.querySelector('.hint').textContent = 'At least 8 characters. There is no way to recover it!';
     }
 
