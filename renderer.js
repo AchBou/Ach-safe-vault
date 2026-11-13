@@ -7,9 +7,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     const { exists } = await window.mainWindow.status();
     const setupMode = !exists;
     if (setupMode) {
-        greeting.textContent = 'First time here! Choose a master password (Ctrl+Enter)';
+        greeting.textContent = 'First time here! Choose a master password';
         passwordInput.placeholder = 'New master password';
         confirmInput.hidden = false;
+        document.querySelector('.hint').textContent = 'At least 8 characters. There is no way to recover it!';
     }
 
     const showError = (text) => {

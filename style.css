@@ -1,51 +1,75 @@
-@font-face {
-    font-family: "Poppins";
-    src: url("resources/fonts/Poppins/Poppins-Regular.ttf");
-}
-html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
+/* Login screen */
 .container{
-    height: 100%;
-    overflow: auto;
-    background: indianred;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    background: var(--login-bg);
 }
 
 .title{
-    margin-top: 20px;
     text-align: center;
-    font-size: 40px;
-    font-family: Poppins;
-    color: wheat;
+    font-size: 3rem;
+    color: var(--cream);
+    text-shadow: 0 2px 0 rgba(56, 48, 42, .35);
 }
 
 .loginSection{
-    height: 70%;
+    width: 100%;
+    max-width: 440px;
+}
+
+.login-card{
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: 0 10px 30px rgba(56, 48, 42, .3);
 }
 
 .greeting{
-    font-size: 25px;
-    margin: 10px;
+    margin: 0;
+    font-size: 1.05rem;
+    text-align: center;
 }
 
 #password, #password-confirm{
-    margin:15px;
-    padding: 10px;
-    font-size: 25px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    font-family: Poppins, sans-serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    background: #fff;
+    border: 2px solid var(--card-border);
     border-radius: 10px;
+    outline: none;
+}
+#password:focus, #password-confirm:focus{
+    border-color: var(--gold);
+}
+#password-confirm[hidden]{
+    display: none;
+}
+
+.hint{
+    margin: 0;
+    font-size: .8rem;
+    text-align: center;
+    opacity: .65;
 }
 
 #password-error{
     visibility: hidden;
+    min-height: 1.4em;
     text-align: center;
-    margin-top: 50px;
-    font-size: 30px;
-    color: #f5eddf;
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--danger);
 }

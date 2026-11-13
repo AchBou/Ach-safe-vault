@@ -22,7 +22,6 @@
     "electron": "^45.3.2"
   },
   "dependencies": {
-    "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.10.2"
   }
 }

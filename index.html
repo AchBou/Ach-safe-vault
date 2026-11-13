@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="style.css">
     <title>Ach Vault</title>
 </head>
 <body>
     <div class="container">
-        <div class="title">Ach's Safe Vault</div>
+        <div class="title theme-title">Ach's Safe Vault</div>
         <div class="loginSection">
-            <div>
+            <div class="login-card">
                 <p class="greeting">Yo ach! what's up *wink* *wink*</p>
                 <input id="password" type="password">
                 <input id="password-confirm" type="password" placeholder="Confirm password" hidden>
+                <p class="hint">Press Ctrl+Enter to unlock</p>
                 <div id="password-error">Type slower dear Ach!</div>
             </div>
         </div>

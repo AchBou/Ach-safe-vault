@@ -1,0 +1,58 @@
+/* Shared look: fonts + palette used by every page. */
+@font-face {
+    font-family: "Poppins";
+    src: url("resources/fonts/Poppins/Poppins-Regular.ttf");
+    font-weight: 400;
+}
+@font-face {
+    font-family: "Poppins";
+    src: url("resources/fonts/Poppins/Poppins-SemiBold.ttf");
+    font-weight: 600;
+}
+@font-face {
+    font-family: "Fanjofey";
+    src: url("resources/fonts/fanjofey/fanjofey.ttf");
+}
+
+:root {
+    --ink: #38302a;          /* dark brown, same as the "shall not pass" window */
+    --gold: #b9a53d;
+    --cream: #ffeac3;
+    --danger: #f55757;
+    --login-bg: indianred;
+    --main-bg: #FCD1D1;
+    --card: #fff7f0;
+    --card-border: #f0c4c4;
+    --action-cell: #ffeac3;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Poppins, sans-serif;
+    color: var(--ink);
+}
+
+.theme-title {
+    font-family: Fanjofey, Poppins, serif;
+    letter-spacing: 1px;
+}
+
+/* buttons */
+.btn-theme {
+    font-family: Poppins, sans-serif;
+    font-size: 0.95rem;
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--cream);
+    cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+}
+.btn-theme:hover { filter: brightness(1.2); }
+.btn-theme:active { transform: translateY(1px); }
+.btn-theme:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.btn-theme.quiet { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
+.btn-theme.danger { background: var(--danger); color: var(--cream); }

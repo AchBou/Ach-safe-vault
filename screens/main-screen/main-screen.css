@@ -1,134 +1,166 @@
 body{
-    background: #FCD1D1;
-    font-family: Roboto Slab, sans-serif;;
+    box-sizing: border-box;
+    padding: 20px 24px;
+    background: var(--main-bg);
 }
 
 .grid{
     height: 100%;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: 80px 50px auto 70px;
-    grid-gap: 20px;
-}
-
-
-.title, span, .footer{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    row-gap: 18px;
 }
 
 .title{
     grid-column: 2/12;
-    color: white;
-    font-size: 3em;
+    text-align: center;
+    font-size: 2.8rem;
+    color: var(--ink);
 }
 
+/* search */
 .input-container{
     grid-column: 3/11;
     position: relative;
 }
 
-.input-highlight {
-    user-select: none;
-    border-top: 3px solid green;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    max-width: 100%;
-    height: 0;
-    color: transparent;
-    font-size: 24px;
-}
-
 #searchInput{
     width: 100%;
-    height: 50px;
-    padding: 0;
-    border-radius: 0;
-    background-color: transparent;
-    color: white;
-    border: none;
+    box-sizing: border-box;
+    height: 48px;
+    padding: 0 18px;
+    font-family: Poppins, sans-serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    background: #fff;
+    border: 2px solid var(--card-border);
+    border-radius: 24px;
     outline: none;
-    font-size: 24px;
-    border-bottom: 3px solid #FFF;
+}
+#searchInput::placeholder{ color: rgba(56, 48, 42, .45); }
+#searchInput:focus{ border-color: var(--gold); }
+
+/* typed-text underline accent (width follows what you type) */
+.input-highlight{
+    position: absolute;
+    left: 18px;
+    bottom: 7px;
+    max-width: calc(100% - 36px);
+    height: 0;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+    border-top: 3px solid var(--gold);
+    color: transparent;
+    font-size: 1.1rem;
+    font-family: Poppins, sans-serif;
+    white-space: pre;
 }
 
-
+/* table */
 #table{
-    grid-column: 2/12;
+    grid-column: 1/13;
     display: grid;
-    grid-template-columns: repeat(4,1fr);
-    grid-auto-rows: minmax(40px,50px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-auto-rows: minmax(44px, auto);
+    align-content: start;
     overflow: auto;
     gap: 10px;
+    padding-right: 4px;
+}
+
+#table span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-wrap: anywhere;
+    text-align: center;
+    padding: 4px 10px;
+}
+
+.header{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--main-bg);
+    font-weight: 600;
+    font-size: 1.05rem;
 }
 
 .cell{
     border-radius: 10px;
-}
-.header{
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.cell:nth-child(2n){
-    background: #FCD1D1;
-    border: 1px solid white;
-}
-.cell:nth-child(2n+1){
-    background: #D3E0DC;
+    background: var(--card);
+    border: 1px solid var(--card-border);
 }
 .cell:nth-child(4n){
-    background: #AEE1E1;
-    border: none;
-}
-.cell:nth-child(4n-3){
-    background: #ECE2E1;
+    background: var(--action-cell);
+    border-color: transparent;
 }
 
-.footer{
-    grid-column: 2/11;
-}
-
-.footer{
-    gap: 15px;
-}
 .cell i{
     cursor: pointer;
-    margin: 0 8px;
+    margin: 0 7px;
+    font-size: 1.05rem;
+    transition: transform .1s ease, color .15s ease;
 }
+.cell i:hover{ transform: scale(1.2); }
+.cell i.bi-trash:hover{ color: var(--danger); }
+
+.footer{
+    grid-column: 2/12;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+/* dialog */
 #entryDialog{
     border: none;
-    border-radius: 12px;
-    padding: 25px;
-    min-width: 340px;
-    background: #FFF7F7;
+    border-radius: 16px;
+    padding: 26px;
+    min-width: 360px;
+    background: var(--card);
+    color: var(--ink);
+    font-family: Poppins, sans-serif;
+    box-shadow: 0 10px 30px rgba(56, 48, 42, .35);
 }
 #entryDialog::backdrop{
-    background: rgba(0,0,0,.4);
+    background: rgba(56, 48, 42, .55);
 }
 #entryDialog label{
     display: block;
-    margin-top: 10px;
-    font-size: .9em;
+    margin-top: 12px;
+    font-size: .85rem;
+    font-weight: 600;
 }
 #entryDialog input{
     width: 100%;
-    padding: 6px 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-top: 4px;
+    padding: 8px 10px;
+    font-family: Poppins, sans-serif;
+    color: var(--ink);
+    background: #fff;
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    outline: none;
 }
+#entryDialog input:focus{ border-color: var(--gold); }
+
 .dialog-title{
-    font-size: 1.4em;
-    font-weight: bold;
+    font-family: Fanjofey, Poppins, serif;
+    font-size: 1.8rem;
 }
 .dialog-error{
     min-height: 1.4em;
-    margin-top: 8px;
-    color: #b00020;
+    margin-top: 10px;
+    font-size: .9rem;
+    color: var(--danger);
 }
 .dialog-actions{
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 6px;
 }

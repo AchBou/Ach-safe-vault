@@ -3,14 +3,15 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
     <title>Ach Vault</title>
     <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../theme.css">
     <link rel="stylesheet" href="main-screen.css">
 </head>
 <body>
     <div class="grid">
-        <div class="title">Ach's Safe Vault</div>
+        <div class="title theme-title">Ach's Safe Vault</div>
 
         <div class="input-container">
-            <input  type="text" id="searchInput">
+            <input type="text" id="searchInput" placeholder="Search platform or ID..." autocomplete="off">
             <span class="input-highlight"></span>
         </div>
 
@@ -21,8 +22,8 @@
             <span class="header">Action</span>
         </div>
         <div class="footer">
-            <button id="addBtn">+ Add</button>
-            <button id="logout">bye !</button>
+            <button id="addBtn" class="btn-theme">+ Add entry</button>
+            <button id="logout" class="btn-theme quiet">Bye !</button>
         </div>
 
         <dialog id="entryDialog">
@@ -35,8 +36,8 @@
             <input type="text" id="fPwd" autocomplete="off">
             <div id="dialogError" class="dialog-error"></div>
             <div class="dialog-actions">
-                <button type="button" id="dialogCancel">Cancel</button>
-                <button type="button" id="dialogSave">Save</button>
+                <button type="button" id="dialogCancel" class="btn-theme quiet">Cancel</button>
+                <button type="button" id="dialogSave" class="btn-theme">Save</button>
             </div>
         </dialog>
     </div>
