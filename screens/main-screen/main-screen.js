@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // unique token so a stored value of "actions" can't be mistaken for the icon cell
 const ACTIONS = Symbol('actions');
-const MASK = '•'.repeat(8);
+const MASK = '\u2022'.repeat(8);
 
 // header = first 4 children; everything after is data rows
 function renderTable(table, data){
