@@ -89,3 +89,46 @@ body{
 .footer{
     grid-column: 2/11;
 }
+
+.footer{
+    gap: 15px;
+}
+.cell i{
+    cursor: pointer;
+    margin: 0 8px;
+}
+#entryDialog{
+    border: none;
+    border-radius: 12px;
+    padding: 25px;
+    min-width: 340px;
+    background: #FFF7F7;
+}
+#entryDialog::backdrop{
+    background: rgba(0,0,0,.4);
+}
+#entryDialog label{
+    display: block;
+    margin-top: 10px;
+    font-size: .9em;
+}
+#entryDialog input{
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.dialog-title{
+    font-size: 1.4em;
+    font-weight: bold;
+}
+.dialog-error{
+    min-height: 1.4em;
+    margin-top: 8px;
+    color: #b00020;
+}
+.dialog-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}

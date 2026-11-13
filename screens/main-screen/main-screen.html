@@ -21,8 +21,24 @@
             <span class="header">Action</span>
         </div>
         <div class="footer">
+            <button id="addBtn">+ Add</button>
             <button id="logout">bye !</button>
         </div>
+
+        <dialog id="entryDialog">
+            <div id="dialogTitle" class="dialog-title">Add entry</div>
+            <label for="fPlatform">Platform</label>
+            <input type="text" id="fPlatform" autocomplete="off">
+            <label for="fId">ID</label>
+            <input type="text" id="fId" autocomplete="off">
+            <label for="fPwd">Password</label>
+            <input type="text" id="fPwd" autocomplete="off">
+            <div id="dialogError" class="dialog-error"></div>
+            <div class="dialog-actions">
+                <button type="button" id="dialogCancel">Cancel</button>
+                <button type="button" id="dialogSave">Save</button>
+            </div>
+        </dialog>
     </div>
     <script src="main-screen.js"></script>
 </body>

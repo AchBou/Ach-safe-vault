@@ -13,7 +13,10 @@ contextBridge.exposeInMainWorld('mainWindow', {
 })
 
 contextBridge.exposeInMainWorld('homeWindow', {
-    read: () => ipcRenderer.invoke('readData')
+    read: () => ipcRenderer.invoke('readData'),
+    add: (platform, id, pwd) => ipcRenderer.invoke('addEntry', platform, id, pwd),
+    update: (oldPlatform, platform, id, pwd) => ipcRenderer.invoke('updateEntry', oldPlatform, platform, id, pwd),
+    remove: (platform) => ipcRenderer.invoke('deleteEntry', platform)
 })
 
 
