@@ -115,7 +115,7 @@ body{
 }
 
 /* dialog */
-#entryDialog{
+#entryDialog, #pwdDialog{
     border: none;
     border-radius: 16px;
     padding: 26px;
@@ -125,16 +125,16 @@ body{
     font-family: Poppins, sans-serif;
     box-shadow: 0 10px 30px rgba(56, 48, 42, .35);
 }
-#entryDialog::backdrop{
+#entryDialog::backdrop, #pwdDialog::backdrop{
     background: rgba(56, 48, 42, .55);
 }
-#entryDialog label{
+#entryDialog label, #pwdDialog label{
     display: block;
     margin-top: 12px;
     font-size: .85rem;
     font-weight: 600;
 }
-#entryDialog input{
+#entryDialog input, #pwdDialog input{
     width: 100%;
     box-sizing: border-box;
     margin-top: 4px;
@@ -146,7 +146,7 @@ body{
     border-radius: 8px;
     outline: none;
 }
-#entryDialog input:focus{ border-color: var(--gold); }
+#entryDialog input:focus, #pwdDialog input:focus{ border-color: var(--gold); }
 
 .dialog-title{
     font-family: Fanjofey, Poppins, serif;
@@ -164,3 +164,12 @@ body{
     gap: 10px;
     margin-top: 6px;
 }
+
+.strength{
+    min-height: 1.3em;
+    margin-top: 4px;
+    font-size: .8rem;
+}
+.strength[data-level="0"], .strength[data-level="1"]{ color: var(--danger); }
+.strength[data-level="2"]{ color: #a07d12; }
+.strength[data-level="3"]{ color: #3b7a3b; }

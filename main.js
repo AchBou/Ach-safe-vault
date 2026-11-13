@@ -247,6 +247,26 @@ The file is encrypted. Opening it on another device needs your master password.`
         return { ok: true };
     });
 
+    handle('changePassword', async (event, current, next) => {
+        if (!authenticated) throw new Error('Not authenticated');
+        const wait = lockedUntil - Date.now();
+        if (wait > 0) return { ok: false, error: `Too many attempts, wait ${Math.ceil(wait / 1000)}s` };
+        if (typeof current !== 'string' || typeof next !== 'string') return { ok: false, error: 'Invalid input' };
+        if (!VaultStore.unlock(vaultFile(), current)) {
+            registerFailure();
+            return { ok: false, error: 'Current password is wrong' };
+        }
+        failedAttempts = 0;
+        if (next.length < MIN_PASSWORD_LENGTH) return { ok: false, error: `Use at least ${MIN_PASSWORD_LENGTH} characters` };
+        if (next === current) return { ok: false, error: 'New password must be different' };
+        // new salt + new key; the file is replaced atomically
+        const oldKey = vaultKey;
+        vaultKey = VaultStore.create(vaultFile(), next, vaultData);
+        oldKey.fill(0);
+        resetIdleTimer();
+        return { ok: true };
+    });
+
     handle('activity', async () => { resetIdleTimer(); });
 
     handle('copyPassword', async (event, platform) => {

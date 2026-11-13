@@ -65,3 +65,11 @@ test('isValidFile accepts our own files and rejects junk', () => {
     assert.strictEqual(V.isValidFile(Buffer.from(JSON.stringify(j))), false);
     assert.strictEqual(V.isValidFile('string'), false);
 });
+
+test('create over an existing file re-keys it (old password stops working)', () => {
+    const f = tmp();
+    V.create(f, 'old-password', { a: 1 });
+    V.create(f, 'new-password', { a: 1 });
+    assert.strictEqual(V.unlock(f, 'old-password'), null);
+    assert.deepStrictEqual(V.unlock(f, 'new-password').data, { a: 1 });
+});

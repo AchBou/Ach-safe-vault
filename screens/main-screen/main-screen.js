@@ -11,6 +11,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     handleDialog(table, input);
     handleLogout();
     handleBackup();
+    handlePasswordDialog();
     trackActivity();
 })
 
@@ -208,5 +209,40 @@ function handleBackup(){
         const res = await window.homeWindow.importVault();
         if (!res.ok && res.error) alert(res.error);
         // on success the main process locks and returns to the login page
+    });
+}
+
+
+// ---------- change master password ----------
+
+function handlePasswordDialog(){
+    const dialog = document.getElementById('pwdDialog');
+    const [cur, nw, conf] = ['pCurrent', 'pNew', 'pConfirm'].map((id) => document.getElementById(id));
+    const error = document.getElementById('pwdError');
+    const strength = document.getElementById('pStrength');
+    const clear = () => { [cur, nw, conf].forEach((i) => { i.value = ''; }); };
+
+    document.getElementById('pwdBtn').addEventListener('click', () => {
+        clear();
+        error.textContent = '';
+        strength.textContent = '';
+        dialog.showModal();
+        cur.focus();
+    });
+    document.getElementById('pwdCancel').addEventListener('click', () => { clear(); dialog.close(); });
+
+    nw.addEventListener('input', () => {
+        const s = window.passwordStrength(nw.value);
+        strength.textContent = s.label ? `Strength: ${s.label}` : '';
+        strength.dataset.level = s.level;
+    });
+
+    document.getElementById('pwdSave').addEventListener('click', async () => {
+        if (nw.value !== conf.value) { error.textContent = 'New passwords do not match'; return; }
+        const res = await window.homeWindow.changePassword(cur.value, nw.value);
+        if (!res.ok) { error.textContent = res.error; return; }
+        clear();
+        dialog.close();
+        alert('Master password changed.');
     });
 }

@@ -25,6 +25,7 @@
             <button id="addBtn" class="btn-theme">+ Add entry</button>
             <button id="exportBtn" class="btn-theme quiet">Export</button>
             <button id="importBtn" class="btn-theme quiet">Import</button>
+            <button id="pwdBtn" class="btn-theme quiet">Password</button>
             <button id="logout" class="btn-theme quiet">Bye !</button>
         </div>
 
@@ -42,6 +43,23 @@
                 <button type="button" id="dialogSave" class="btn-theme">Save</button>
             </div>
         </dialog>
+
+        <dialog id="pwdDialog">
+            <div class="dialog-title">Change master password</div>
+            <label for="pCurrent">Current password</label>
+            <input type="password" id="pCurrent" autocomplete="off">
+            <label for="pNew">New password</label>
+            <input type="password" id="pNew" autocomplete="off">
+            <div id="pStrength" class="strength"></div>
+            <label for="pConfirm">Confirm new password</label>
+            <input type="password" id="pConfirm" autocomplete="off">
+            <div id="pwdError" class="dialog-error"></div>
+            <div class="dialog-actions">
+                <button type="button" id="pwdCancel" class="btn-theme quiet">Cancel</button>
+                <button type="button" id="pwdSave" class="btn-theme">Change</button>
+            </div>
+        </dialog>
     </div>
+    <script src="../../strength.js"></script>
     <script src="main-screen.js"></script>
 </body>

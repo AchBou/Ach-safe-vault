@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('mainWindow', {
 
 contextBridge.exposeInMainWorld('homeWindow', {
     read: () => ipcRenderer.invoke('readData'),
+    changePassword: (current, next) => ipcRenderer.invoke('changePassword', current, next),
     exportVault: () => ipcRenderer.invoke('exportVault'),
     importVault: () => ipcRenderer.invoke('importVault'),
     copy: (platform) => ipcRenderer.invoke('copyPassword', platform),

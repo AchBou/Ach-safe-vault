@@ -16,7 +16,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             const res = await window.mainWindow.importVault();
             if (!res.ok && res.error) showError(res.error);
         });
-        document.querySelector('.hint').textContent = 'At least 8 characters. There is no way to recover it!';
+        const hint = document.querySelector('.hint');
+        const base = 'There is no way to recover it!';
+        hint.textContent = 'At least 8 characters. ' + base;
+        passwordInput.addEventListener('input', () => {
+            const s = window.passwordStrength(passwordInput.value);
+            hint.textContent = s.label ? `Strength: ${s.label}. ${base}` : 'At least 8 characters. ' + base;
+        });
     }
 
     const showError = (text) => {
