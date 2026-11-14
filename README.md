@@ -3,7 +3,7 @@
 A small Electron password manager with a Lord of the Rings sense of humour: press **Enter** on the
 login screen and the Gatekeeper tells you *you shall not pass*. There is exactly one way in.
 
-> **Live demo:** _add your hosted URL here_ (runs in the browser with fake data, never enter real passwords).
+> **Live demo:** [achbou.github.io/Ach-safe-vault](https://achbou.github.io/Ach-safe-vault/) (runs in the browser with fake data, never enter real passwords).
 
 ## Features
 
