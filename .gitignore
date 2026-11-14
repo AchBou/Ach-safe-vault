@@ -20,3 +20,6 @@ npm-debug.log*
 /node_modules
 # plaintext legacy vault (data now lives encrypted in userData/vault.enc)
 /vault/
+
+# built web demo
+/demo-dist

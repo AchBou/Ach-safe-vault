@@ -1,0 +1,79 @@
+/* Extras that only exist in the web demo. */
+
+.demo-badge {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 50;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 12px;
+    font: 600 .72rem/1.2 Poppins, sans-serif;
+    letter-spacing: .3px;
+    color: #ffeac3;
+    background: rgba(56, 48, 42, .92);
+    border-radius: 999px;
+}
+.demo-badge a {
+    color: #b9a53d;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* hint box on the login page (collapsed so the gag still works) */
+.demo-hint {
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    padding: 10px 16px;
+    font: .85rem/1.5 Poppins, sans-serif;
+    color: #ffeac3;
+    background: rgba(56, 48, 42, .55);
+    border-radius: 12px;
+}
+.demo-hint summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+.demo-hint code {
+    padding: 1px 6px;
+    color: #38302a;
+    background: #ffeac3;
+    border-radius: 4px;
+    user-select: all;
+}
+.demo-hint a {
+    color: #b9a53d;
+}
+.demo-hint ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+/* the "you shall not pass" popup */
+.demo-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .6);
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+.demo-overlay.ready {
+    opacity: 1;
+}
+.demo-overlay-frame {
+    width: min(1000px, 95vw);
+    height: 400px;
+    border: 0;
+    border-radius: 10px;
+    background: #38302a;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+}
+
+/* keep the fixed badge from covering the footer buttons */
+body { padding-bottom: 56px; }

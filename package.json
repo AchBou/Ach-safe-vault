@@ -7,7 +7,9 @@
     "start": "electron .",
     "test": "node --test \"test/*.test.js\"",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win nsis"
+    "dist": "electron-builder --win nsis",
+    "demo:build": "node demo/build.js",
+    "demo:serve": "node demo/build.js && python -m http.server 8080 --directory demo-dist"
   },
   "keywords": [
     "ach",
@@ -22,7 +24,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^45.3.2",
-    "electron-builder": "^26.18.0"
+    "electron-builder": "^26.18.0",
+    "hash-wasm": "^4.13.0"
   },
   "dependencies": {
     "bootstrap-icons": "^1.10.2"
