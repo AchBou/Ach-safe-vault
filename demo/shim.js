@@ -31,19 +31,30 @@
 
     // ---------- helpers ----------
 
-    const toHex = (buf) => Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
-    const fromHex = (hex) => new Uint8Array(hex.match(/../g).map((h) => parseInt(h, 16)));
+    // bytes -> "0a1b2c..."
+    function toHex(bytes) {
+        return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
+    }
 
-    const store = {
-        get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-        set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage blocked */ } },
-        del: (k) => { try { localStorage.removeItem(k); } catch { /* ignore */ } },
-    };
-    const session = {
-        get: (k) => { try { return sessionStorage.getItem(k); } catch { return null; } },
-        set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* ignore */ } },
-        del: (k) => { try { sessionStorage.removeItem(k); } catch { /* ignore */ } },
-    };
+    // "0a1b2c..." -> bytes
+    function fromHex(hex) {
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+        }
+        return bytes;
+    }
+
+    // Browsers can block storage (private mode, strict settings), so every call is wrapped in try/catch.
+    function safeStorage(getStorage) {
+        return {
+            get: (key) => { try { return getStorage().getItem(key); } catch { return null; } },
+            set: (key, value) => { try { getStorage().setItem(key, value); } catch { /* blocked: ignore */ } },
+            del: (key) => { try { getStorage().removeItem(key); } catch { /* blocked: ignore */ } },
+        };
+    }
+    const store = safeStorage(() => localStorage);     // survives closing the tab: the encrypted vault
+    const session = safeStorage(() => sessionStorage); // cleared when the tab closes: the unlocked session
 
     // ---------- crypto (same file format as vault-store.js: { v, salt, iv, tag, ct } in hex) ----------
 
@@ -78,14 +89,18 @@
         return JSON.parse(dec.decode(pt));
     }
 
+    const MAX_FILE_BYTES = 10 * 1024 * 1024;
+    const isHex = (value, length) =>
+        typeof value === 'string' && /^[0-9a-f]+$/i.test(value) && (length === undefined || value.length === length);
+
+    // Structure check only: does this look like a vault file? Same rules as vault-store.js.
     function isValidFile(text) {
+        if (typeof text !== 'string' || text.length > MAX_FILE_BYTES) return false;
         try {
-            if (typeof text !== 'string' || text.length > 10 * 1024 * 1024) return false;
-            const f = JSON.parse(text);
-            const hex = (v, len) => typeof v === 'string' && /^[0-9a-f]*$/i.test(v) && (len === undefined || v.length === len);
-            return f.v === 1 && hex(f.salt, 32) && hex(f.iv, 24) && hex(f.tag, 32) && hex(f.ct) && f.ct.length > 0;
+            const file = JSON.parse(text);
+            return file.v === 1 && isHex(file.salt, 32) && isHex(file.iv, 24) && isHex(file.tag, 32) && isHex(file.ct);
         } catch {
-            return false;
+            return false; // not JSON
         }
     }
 
@@ -251,7 +266,7 @@
 
         copy: async (platform) => {
             const data = await currentData();
-            if (typeof platform !== 'string' || !Object.prototype.hasOwnProperty.call(data, platform)) return { ok: false };
+            if (typeof platform !== 'string' || !Object.hasOwn(data, platform)) return { ok: false };
             await clearClipboardNow();
             copiedValue = data[platform].pwd;
             try { await navigator.clipboard.writeText(copiedValue); } catch { return { ok: false }; }
@@ -377,29 +392,36 @@
         if (container && document.getElementById('password')) {
             const hint = document.createElement('details');
             hint.className = 'demo-hint';
+
             const summary = document.createElement('summary');
             summary.textContent = 'Demo hints';
+
             const list = document.createElement('ul');
-            const items = [];
+            const addItem = (text, code) => {
+                const item = document.createElement('li');
+                item.append(text);
+                if (code) {
+                    const codeElement = document.createElement('code');
+                    codeElement.textContent = code;
+                    item.append(codeElement);
+                }
+                list.append(item);
+            };
+
             // the demo password only applies while the original demo vault is untouched
-            if (store.get(SEEDED_KEY) === '1') items.push(['Master password: ', DEMO_PASSWORD]);
-            items.push(['Press Enter first and see what happens. The real way in is Ctrl+Enter.']);
-            for (const [label, code] of items) {
-                const li = document.createElement('li');
-                li.append(label);
-                if (code) { const c = document.createElement('code'); c.textContent = code; li.append(c); }
-                list.append(li);
-            }
-            const setup = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = base + 'index.html?setup';
-            link.textContent = 'Try the first-run setup instead';
-            setup.append(link);
-            list.append(setup);
+            if (store.get(SEEDED_KEY) === '1') addItem('Master password: ', DEMO_PASSWORD);
+            addItem('Press Enter first and see what happens. The real way in is Ctrl+Enter.');
+
+            const setupItem = document.createElement('li');
+            const setupLink = document.createElement('a');
+            setupLink.href = base + 'index.html?setup';
+            setupLink.textContent = 'Try the first-run setup instead';
+            setupItem.append(setupLink);
+            list.append(setupItem);
+
             hint.append(summary, list);
             container.append(hint);
         }
     });
 
-    window.__demo = { DEMO_PASSWORD };
 })();
