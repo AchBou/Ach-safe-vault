@@ -45,7 +45,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const onKey = async (e) => {
         if (e.key !== 'Enter') return;
-        if (e.ctrlKey) await submit();
+        if (e.ctrlKey || setupMode) await submit();
         else if (!setupMode) await window.alertWindow.show();
     };
     passwordInput.addEventListener('keyup', onKey);

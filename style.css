@@ -73,3 +73,7 @@
     font-weight: 600;
     color: var(--danger);
 }
+
+.hint:empty{
+    display: none;
+}
