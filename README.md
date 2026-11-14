@@ -64,6 +64,8 @@ npm run demo:serve   # build + serve on http://localhost:8080
 ```
 
 Host the `demo-dist/` folder on any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages).
+This repo includes `.github/workflows/demo-pages.yml`, which runs the tests, builds the demo and deploys it to
+GitHub Pages on every push to `main`. One-time setup: **Settings > Pages > Source: GitHub Actions**.
 The demo starts with a pre-filled account; the password is shown in a collapsed "Demo hints" box on the login page.
 Use `?reset` to restore the demo data and `?setup` to try the first-run flow.
 
