@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4d4138"/>
+      <stop offset="1" stop-color="#26201b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#f5a742" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#f5a742" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1df8c"/>
+      <stop offset=".5" stop-color="#b9a53d"/>
+      <stop offset="1" stop-color="#7a6a1c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="230" fill="url(#glow)"/>
+
+  <!-- the ring -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#1d1814" stroke-opacity=".55" stroke-width="62" transform="translate(0 6)"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#gold)" stroke-width="56"/>
+  <circle cx="256" cy="256" r="164" fill="none" stroke="#fff6c7" stroke-opacity=".35" stroke-width="5" stroke-dasharray="190 900" transform="rotate(-150 256 256)"/>
+
+  <!-- keyhole -->
+  <g fill="#ffeac3">
+    <circle cx="256" cy="236" r="30"/>
+    <path d="M238 252 L274 252 L286 318 L226 318 Z"/>
+  </g>
+</svg>

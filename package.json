@@ -51,10 +51,12 @@
       "!node_modules/bootstrap-icons/icons/**",
       "!node_modules/bootstrap-icons/bootstrap-icons.svg",
       "!node_modules/bootstrap-icons/font/*.scss",
-      "!node_modules/bootstrap-icons/font/*.json"
+      "!node_modules/bootstrap-icons/font/*.json",
+      "build/icon.png"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,
